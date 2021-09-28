@@ -28,8 +28,8 @@ async def create_user(user_body: UserBody, response: Response):
         del user_created.password
         return {"user": user_created}
     except ExceptionUser as e:
-        response.status = status.HTTP_400_BAD_REQUEST
+        response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
     except Exception as e:
-        response.status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": 'server error'}
