@@ -16,11 +16,12 @@ async def get_token(user_body: UserAuthBody, response: Response):
     try:
         create_token = CreateTokenUsecase()
         token = create_token.create(user_body.email, user_body.password)
+        response.status_code = status.HTTP_201_CREATED
         return {"token": token}
     except ExceptionUser as e:
-        response.status = status.HTTP_400_BAD_REQUEST
+        response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}
     except Exception as e:
         print(e)
-        response.status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": f'server error'}
