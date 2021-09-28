@@ -14,7 +14,7 @@ async def get_books(book_id: str, response: Response):
         book = Book.get(Book.id == book_id)
         return {"book": book.__data__}
     except Exception as e:
-        response.status = status.HTTP_404_NOT_FOUND
+        response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": f'book {book_id} not found'}
 
 
@@ -24,5 +24,5 @@ async def get_books(response: Response):
         books = [book.__data__ for book in Book.select()]
         return {"book": books}
     except Exception as e:
-        response.status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": f'server error'}
