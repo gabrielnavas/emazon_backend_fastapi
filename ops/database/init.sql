@@ -1,0 +1,2 @@
+CREATE SCHEMA books;
+CREATE SCHEMA users;

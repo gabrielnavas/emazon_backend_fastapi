@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  database_dev:
+    container_name: amazon_clone_db
+    image: postgres
+    restart: always
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=dev
+        - POSTGRES_DB=amazon_clone_db
+    ports:
+        - "5435:5432"
+        - "5436:5432"
+    volumes:
+        - ./ops/database:/docker-entrypoint-initdb.d
