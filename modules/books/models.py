@@ -2,7 +2,7 @@ from datetime import datetime
 
 import peewee
 
-from modules.shared.models import BaseModel, schemas
+from modules.shared.models import BaseModel, schemas, peewee
 
 
 class TypeCover(BaseModel):
@@ -47,10 +47,9 @@ class PublishingCompany(BaseModel):
         schema = schemas['books']
 
     name = peewee.CharField(max_length=255, unique=True)
-    
+
     def __str__(self):
         return self.name
-
 
 
 class Book(BaseModel):

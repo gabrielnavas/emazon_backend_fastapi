@@ -1,3 +1,5 @@
+# Users
+
 ## Create user
 
 ```sh
@@ -23,19 +25,47 @@ curl --location --request POST 'http://localhost:5000/api/users/token' \
 }'
 ```
 
-## Get books
+# Shop
 
+## Get a book
 ```sh
-curl --location --request GET 'http://localhost:5000/api/books' \
+# book_id={id from book}
+curl --location --request GET 'http://localhost:5000/api/shop/book/{book_id}' \
 --header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' 
 ```
 
 
-## Get a book
+## Get list of book.id
 
 ```sh
-curl --location --request GET 'http://localhost:5000/api/books/1' \
+curl --location --request GET 'http://localhost:5000/api/shop/books/get_ids' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' 
+```
+
+
+
+## Get all book pagineted
+
+```sh
+# is_paginator_id =  {true or false}
+# limit={limit number or 0 to all}
+# book_per_page={how much por page}
+
+curl --location --request GET 'http://localhost:5000/api/shop/book/?is_paginator_id=true&limit={0}&book_per_page={10}' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' 
+```
+
+
+```sh
+# is_paginator_id =  {true or false}
+# limit={limit number or 0 to all}
+# book_per_page={how much por page}
+# page={page number}
+
+curl --location --request GET 'http://localhost:5000/api/shop/book/?is_paginator_id=true&limit={0}&book_per_page={10}&page={0}' \
 --header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' 
 ```

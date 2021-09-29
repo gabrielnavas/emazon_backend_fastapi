@@ -34,6 +34,10 @@ async def startup_event():
 
     init_tables()
 
+    # create data for devs
+    # from main.init_dev_data import init_dev_data
+    # init_dev_data()
+
 
 @app.get("/")
 async def root():

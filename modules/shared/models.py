@@ -1,4 +1,3 @@
-
 import peewee
 
 database_name = 'amazon_clone_db'
