@@ -58,6 +58,7 @@ curl --location --request GET 'http://localhost:5000/api/shop/book/?is_paginator
 --header 'Content-Type: application/json' 
 ```
 
+## Get a page book pagineted
 
 ```sh
 # is_paginator_id =  {true or false}

@@ -1,40 +1,9 @@
-from typing import Optional
-from fastapi import APIRouter, Depends, status, Request, Response
-from playhouse.shortcuts import model_to_dict, dict_to_model
+from fastapi import APIRouter, status, Response
+from playhouse.shortcuts import model_to_dict
 
-from modules.users import get_token_header
-from modules.books.models import Book, TypeCover, Language, Author, Category, PublishingCompany, peewee
+from modules.books.models import Book
 
-router = APIRouter(
-    # dependencies=[Depends(get_token_header)]
-)
-
-
-@router.get("/api/shop/book/{book_id}")
-async def get_books(book_id: int, response: Response):
-    try:
-        if book_id <= 0:
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return {"detail": f'book_id needs to be greater than 0'}
-        book = Book.get(Book.id == book_id)
-        return {"book": model_to_dict(book)}
-    except Exception as e:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"detail": f'book {book_id} not found'}
-
-
-@router.get("/api/shop/books/get_ids")
-async def get_books(response: Response):
-    try:
-        query_books = (
-            Book.select()
-        )
-
-        books = [book.id for book in query_books]
-        return {"books": books}
-    except Exception as e:
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return {"detail": f'server error'}
+router = APIRouter()
 
 
 def split_books(query_books, book_per_page):

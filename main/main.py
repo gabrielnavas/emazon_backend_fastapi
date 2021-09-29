@@ -1,11 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import modules.books.models as book_models
-import modules.users.models as users_models
-
-from modules.books.controllers import router as books_router
 from modules.users import token_router, users_router
+from modules.books.controllers.get_book import router as get_book_router
+from modules.books.controllers.get_books_id import router as get_books_id_router
+from modules.books.controllers.get_books import router as get_books_router
 
 app = FastAPI()
 
@@ -21,22 +20,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(books_router)
+# users
 app.include_router(token_router)
-app.include_router(users_router)
+app.include_router(get_books_id_router)
+
+# books
+app.include_router(get_book_router)
+app.include_router(get_book_router)
+app.include_router(get_books_router)
 
 
 @app.on_event("startup")
 async def startup_event():
-    def init_tables():
-        book_models.create_tables()
-        users_models.create_tables()
+    # from main.init_tables_database import init_tables
+    # init_tables()
 
-    init_tables()
-
-    # create data for devs
     # from main.init_dev_data import init_dev_data
     # init_dev_data()
+    pass
 
 
 @app.get("/")
