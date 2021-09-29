@@ -54,7 +54,10 @@ def split_books(query_books, book_per_page):
 
 
 def one_page(array_books, page: int):
-    return {"books": array_books[page]}
+    return {
+        "books": array_books[page],
+        "limit_page": len(array_books) - 1
+    }
 
 
 @router.get("/api/shop/book")
