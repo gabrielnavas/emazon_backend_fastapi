@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, status, Response
+from typing import Optional
+from fastapi import APIRouter, Depends, status, Request, Response
 from modules.users import get_token_header
 
 from modules.books.models import Book
 
 router = APIRouter(
-    dependencies=[Depends(get_token_header)]
+    # dependencies=[Depends(get_token_header)]
 )
 
 
@@ -19,9 +20,9 @@ async def get_books(book_id: str, response: Response):
 
 
 @router.get("/api/books")
-async def get_books(response: Response):
+async def get_books(response: Response, skip: int = 0, limit: int = 10):
     try:
-        books = [book.__data__ for book in Book.select()]
+        books = [book.__data__ for book in Book.select().offset(skip).limit(limit)]
         return {"book": books}
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
