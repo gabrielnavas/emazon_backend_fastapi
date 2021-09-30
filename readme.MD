@@ -3,7 +3,7 @@
 ## Create user
 
 ```sh
-curl --location --request POST 'http://localhost:5000/api/users' \
+curl --location --request POST 'http://localhost:5000/api/register' \
 --header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -17,7 +17,7 @@ curl --location --request POST 'http://localhost:5000/api/users' \
 ## Login
 
 ```sh
-curl --location --request POST 'http://localhost:5000/api/users/token' \
+curl --location --request POST 'http://localhost:5000/api/login' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "email": "user@gmail.com",

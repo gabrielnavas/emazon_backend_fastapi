@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from modules.users import token_router, users_router
+from modules.users import login_router, register_router
 from modules.books.controllers.get_book import router as get_book_router
 from modules.books.controllers.get_books_id import router as get_books_id_router
 from modules.books.controllers.get_books import router as get_books_router
@@ -21,11 +21,11 @@ app.add_middleware(
 )
 
 # users
-app.include_router(token_router)
-app.include_router(get_books_id_router)
+app.include_router(login_router)
+app.include_router(register_router)
 
 # books
-app.include_router(get_book_router)
+app.include_router(get_books_id_router)
 app.include_router(get_book_router)
 app.include_router(get_books_router)
 

@@ -1,3 +1,3 @@
-from .controllers.token import router as token_router
-from .controllers.users import router as users_router
+from .controllers.login import router as login_router
+from .controllers.register import router as register_router
 from .controllers.authentication import get_token_header

@@ -1,5 +1,5 @@
 from fastapi import Header, HTTPException
-from modules.users.usecases.token import JwtCrypter
+from modules.users.usecases.login import JwtCrypter
 
 
 async def get_token_header(authorization: str = Header(...)):

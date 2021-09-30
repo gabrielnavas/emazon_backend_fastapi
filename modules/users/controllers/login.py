@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status, Response
 from pydantic import BaseModel
 
-from modules.users.usecases.token import CreateTokenUsecase
+from modules.users.usecases.login import LoginUsecase
+from modules.users.usecases.exceptions import ExceptionUser
 
 router = APIRouter()
 
@@ -11,17 +12,20 @@ class UserAuthBody(BaseModel):
     password: str
 
 
-@router.post("/api/users/token")
+@router.post("/api/login")
 async def get_token(user_body: UserAuthBody, response: Response):
     try:
-        create_token = CreateTokenUsecase()
-        token = create_token.create(user_body.email, user_body.password)
+        login_usecase = LoginUsecase()
+        result_usecase = login_usecase.login(
+            user_body.email, user_body.password)
+        del result_usecase.user["password"]
+        del result_usecase.user["id"]
+        del result_usecase.user["created_at"]
         response.status_code = status.HTTP_201_CREATED
-        return {"token": token}
+        return result_usecase
     except ExceptionUser as e:
-        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.status_code = status.HTTP_404_NOT_FOUND
         return {"detail": str(e)}
     except Exception as e:
-        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": f'server error'}

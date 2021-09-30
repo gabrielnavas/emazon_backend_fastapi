@@ -14,7 +14,7 @@ class UserBody(BaseModel):
     password_confirmation: str
 
 
-@router.post("/api/users")
+@router.post("/api/register")
 async def create_user(user_body: UserBody, response: Response):
     try:
         user = UserValidation(
@@ -24,9 +24,8 @@ async def create_user(user_body: UserBody, response: Response):
             password_confirmation=user_body.password_confirmation,
         )
         db_create_user = DbCreateUserUsecase()
-        user_created = db_create_user.create(user)
-        del user_created.password
-        return {"user": user_created}
+        db_create_user.create(user)
+        response.status_code = status.HTTP_201_CREATED
     except ExceptionUser as e:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"detail": str(e)}

@@ -2,7 +2,9 @@ from typing import List, Dict, Any, Mapping
 import jwt
 import re
 import datetime
+
 from modules.users.models import User as UserPeewee
+from modules.users.usecases.exceptions import ExceptionUser
 
 from .password_hash import BcryptHash
 
@@ -38,7 +40,13 @@ class JwtCrypter:
         return jwt.decode(encoded_jwt, self.__secret_token, algorithms=[self.__algorithm])
 
 
-class CreateTokenUsecase:
+class LoginResponse:
+    def __init__(self, token: str, user: UserPeewee):
+        self.token = token
+        self.user = user
+
+
+class LoginUsecase:
     def __init__(
             self,
             validation: CreateTokenValidation = CreateTokenValidation(),
@@ -48,7 +56,7 @@ class CreateTokenUsecase:
         self.hash_password = hash_password
         self.token = create_token
 
-    def create(self, email: str, plain_password: str) -> str:
+    def login(self, email: str, plain_password: str) -> LoginResponse:
         self.validation.validate(email, plain_password)
 
         user_founds = UserPeewee.select().where(UserPeewee.email == email)
@@ -56,8 +64,10 @@ class CreateTokenUsecase:
             raise ExceptionUser('user does not exist')
 
         user_found = user_founds[0]
-        if not self.hash_password.check(plain_password=plain_password, hash_password=user_found.password):
+        if not self.hash_password.check(
+                plain_password=plain_password,
+                hash_password=user_found.password):
             raise ExceptionUser('user does not exist')
         payload = {'user_id': user_found.id}
         token = self.token.create(payload)
-        return token
+        return LoginResponse(token, user_found.__data__)

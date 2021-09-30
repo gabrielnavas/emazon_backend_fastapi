@@ -14,14 +14,6 @@ class UserValidation:
         self.password_confirmation = password_confirmation
 
 
-class UserCreated:
-    def __init__(self, id: int, full_name, email, password):
-        self.id = id
-        self.full_name = full_name
-        self.email = email
-        self.password = password
-
-
 class CreateUserValidation:
     __email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
@@ -57,12 +49,11 @@ class DbCreateUserUsecase:
         self.validation = validation
         self.hash_password = hash_password
 
-    def create(self, user: UserValidation) -> UserCreated:
+    def create(self, user: UserValidation) -> None:
         self.validation.validate(user)
         password_hashed = self.hash_password.create(user.password)
-        user = UserPeewee.create(
+        UserPeewee.create(
             full_name=user.full_name,
             email=user.email,
             password=password_hashed,
         )
-        return UserCreated(user.id, user.full_name, user.email, user.password)
