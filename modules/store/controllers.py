@@ -9,6 +9,8 @@ from modules.store.models import Store
 
 from pycpfcnpj import cpfcnpj
 
+from .exceptions import ExceptionUser
+
 router = APIRouter(
     dependencies=[Depends(verify_token_header)]
 )
@@ -27,8 +29,16 @@ async def open_store(open_store_body: OpenStoreBody, request: Request, response:
             request.headers['authorization'])
 
         if not open_store_body.cpf and not open_store_body.cnpj:
-            response.status_code = status.HTTP_400_BAD_REQUEST
-            return {"detail": 'missing a cpf or cnpj'}
+            raise ExceptionUser('missing a cpf or cnpj')
+
+        if open_store_body.cpf != None and open_store_body.cnpj != None:
+            raise ExceptionUser('just cpf or cnpj peer store')
+
+        if open_store_body.cpf != None and not cpfcnpj.validate(open_store_body.cnpj):
+            raise ExceptionUser('cpf needs to be 11 length')
+
+        if open_store_body.cnpj != None and not cpfcnpj.validate(open_store_body.cnpj):
+            raise ExceptionUser('cnpj needs to be 14 length')
 
         stores_found = Store.select().where(
             (Store.fantasy_name == open_store_body.fantasy_name) |
@@ -40,20 +50,15 @@ async def open_store(open_store_body: OpenStoreBody, request: Request, response:
         if len(stores_found) > 0:
             store = stores_found[0]
             if store.fantasy_name == open_store_body.fantasy_name:
-                response.status_code = status.HTTP_400_BAD_REQUEST
-                return {"detail": 'already has a store with this fantasy name'}
+                raise ExceptionUser(
+                    'já existe uma loja com esse nome fantasia')
             elif store.cnpj == open_store_body.cnpj:
-                response.status_code = status.HTTP_400_BAD_REQUEST
-                return {"detail": 'already has a store with this cnpj'}
+                raise ExceptionUser('já existe uma loja com esse CNPJ')
             elif store.cpf == open_store_body.cpf:
-                response.status_code = status.HTTP_400_BAD_REQUEST
-                return {"detail": 'already has a store with this cpf'}
-            elif store.cpf == open_store_body.cpf:
-                response.status_code = status.HTTP_400_BAD_REQUEST
-                return {"detail": 'already has a store with this cpf'}
+                raise ExceptionUser('já existe uma loja com esse CPF')
             elif store.salesman == user_from_token:
-                response.status_code = status.HTTP_400_BAD_REQUEST
-                return {"detail": 'you already has a store opened'}
+                raise ExceptionUser(
+                    'Você já tem uma loja aberta com essa conta')
 
         store_created = Store.create(
             fantasy_name=open_store_body.fantasy_name,
@@ -65,6 +70,9 @@ async def open_store(open_store_body: OpenStoreBody, request: Request, response:
         del store_created['salesman']
         response.status_code = status.HTTP_201_CREATED
         return {'store': store_created}
+    except ExceptionUser as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"detail": str(e)}
     except Exception as e:
         print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
