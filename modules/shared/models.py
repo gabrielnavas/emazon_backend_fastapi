@@ -7,7 +7,8 @@ pg_db = peewee.PostgresqlDatabase(database_name, user='postgres', password='dev'
 
 schemas = {
     'books': 'books',
-    'users': 'users'
+    'users': 'users',
+    'stores': 'stores'
 }
 
 

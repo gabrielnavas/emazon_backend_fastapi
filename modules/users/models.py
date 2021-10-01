@@ -1,8 +1,6 @@
 from datetime import datetime
 
-import peewee
-
-from modules.shared.models import BaseModel, schemas
+from modules.shared.models import BaseModel, schemas, peewee
 
 
 class User(BaseModel):
