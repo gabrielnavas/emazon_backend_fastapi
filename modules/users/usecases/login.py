@@ -4,6 +4,7 @@ import re
 import datetime
 
 from modules.users.models import User as UserPeewee
+from modules.stores.models import Store as StorePeewee
 from modules.users.usecases.exceptions import ExceptionUser
 
 from .password_hash import BcryptHash
@@ -41,9 +42,10 @@ class JwtCrypter:
 
 
 class LoginResponse:
-    def __init__(self, token: str, user: UserPeewee):
+    def __init__(self, token: str, user: UserPeewee, store: StorePeewee):
         self.token = token
         self.user = user
+        self.store = store
 
 
 class LoginUsecase:
@@ -59,15 +61,25 @@ class LoginUsecase:
     def login(self, email: str, plain_password: str) -> LoginResponse:
         self.validation.validate(email, plain_password)
 
-        user_founds = UserPeewee.select().where(UserPeewee.email == email)
+        user_founds = (UserPeewee
+                       .select()
+                       .where(UserPeewee.email == email)
+                       )
         if user_founds.count() == 0:
             raise ExceptionUser('user does not exist')
 
         user_found = user_founds[0]
+        stores_found = (StorePeewee
+                        .select()
+                        .where(
+                            StorePeewee.salesman == user_found)
+                        )
+
         if not self.hash_password.check(
                 plain_password=plain_password,
                 hash_password=user_found.password):
             raise ExceptionUser('user does not exist')
         payload = {'user_id': user_found.id}
         token = self.token.create(payload)
-        return LoginResponse(token, user_found.__data__)
+        store = stores_found[0].__data__ if len(stores_found) else None
+        return LoginResponse(token, user_found.__data__, store)

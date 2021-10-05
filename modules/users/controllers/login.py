@@ -20,7 +20,12 @@ async def get_token(user_body: UserAuthBody, response: Response):
             user_body.email, user_body.password)
         del result_usecase.user["password"]
         del result_usecase.user["id"]
-        del result_usecase.user["created_at"]
+        if result_usecase.store:
+            del result_usecase.store["id"]
+            del result_usecase.store["salesman"]
+            del result_usecase.store["cpf"]
+            del result_usecase.store["cnpj"]
+            del result_usecase.store["created_at"]
         response.status_code = status.HTTP_201_CREATED
         return result_usecase
     except ExceptionUser as e:
