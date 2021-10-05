@@ -3,7 +3,7 @@
 ## Create user
 
 ```sh
-curl --location --request POST 'http://localhost:5000/api/register' \
+curl --location --request POST '/api/register' \
 --header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -17,7 +17,7 @@ curl --location --request POST 'http://localhost:5000/api/register' \
 ## Login
 
 ```sh
-curl --location --request POST 'http://localhost:5000/api/login' \
+curl --location --request POST '/api/login' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "email": "user@gmail.com",
@@ -30,43 +30,26 @@ curl --location --request POST 'http://localhost:5000/api/login' \
 ## Get a book
 ```sh
 # book_id={id from book}
-curl --location --request GET 'http://localhost:5000/api/shop/book/{book_id}' \
---header 'Authorization: Bearer <token>' \
+curl --location --request GET '/api/shop/book/{book_id}' \
 --header 'Content-Type: application/json' 
 ```
 
 
-## Get list of book.id
+## Get pages limit
 
 ```sh
-curl --location --request GET 'http://localhost:5000/api/shop/books/get_ids' \
---header 'Authorization: Bearer <token>' \
---header 'Content-Type: application/json' 
-```
+# length_per_page={how much books per page}
 
-
-
-## Get all book pagineted
-
-```sh
-# is_paginator_id =  {true or false}
-# limit={limit number or 0 to all}
-# book_per_page={how much por page}
-
-curl --location --request GET 'http://localhost:5000/api/shop/book/?is_paginator_id=true&limit={0}&book_per_page={10}' \
---header 'Authorization: Bearer <token>' \
+curl --location --request GET '/api/shop/books/pages_limit?length_per_page=10' \
 --header 'Content-Type: application/json' 
 ```
 
 ## Get a page book pagineted
 
 ```sh
-# is_paginator_id =  {true or false}
-# limit={limit number or 0 to all}
-# book_per_page={how much por page}
-# page={page number}
+# page={page of books}
+# length_per_page={how much books per page}
 
-curl --location --request GET 'http://localhost:5000/api/shop/book/?is_paginator_id=true&limit={0}&book_per_page={10}&page={0}' \
---header 'Authorization: Bearer <token>' \
+curl --location --request GET '/api/shop/books/page?page=1&length_per_page=10' \
 --header 'Content-Type: application/json' 
 ```

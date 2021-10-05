@@ -3,6 +3,7 @@ from datetime import datetime
 import peewee
 
 from modules.shared.models import BaseModel, schemas, peewee
+from modules.stores.models import Store
 
 
 class TypeCover(BaseModel):
@@ -65,12 +66,13 @@ class Book(BaseModel):
     width = peewee.FloatField(null=False, default=0.00)
     thickness = peewee.FloatField(null=False, default=0.00)
     published_at = peewee.DateField(default=datetime.now)
-    author = peewee.ForeignKeyField(Author, on_delete='NO ACTION')
-    type_cover = peewee.ForeignKeyField(TypeCover, on_delete='NO ACTION')
-    language = peewee.ForeignKeyField(Language, on_delete='NO ACTION')
-    category = peewee.ForeignKeyField(Category, on_delete='NO ACTION')
+    author = peewee.ForeignKeyField(Author, on_delete='RESTRICT')
+    type_cover = peewee.ForeignKeyField(TypeCover, on_delete='RESTRICT')
+    language = peewee.ForeignKeyField(Language, on_delete='RESTRICT')
+    category = peewee.ForeignKeyField(Category, on_delete='RESTRICT')
     publishing_company = peewee.ForeignKeyField(
-        PublishingCompany, on_delete='NO ACTION')
+        PublishingCompany, on_delete='RESTRICT')
+    store = peewee.ForeignKeyField(Store, on_delete='RESTRICT')
 
     def __str__(self):
         return self.title
