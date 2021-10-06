@@ -78,6 +78,14 @@ class Book(BaseModel):
         return self.title
 
 
+class ImageBook(BaseModel):
+    class Meta:
+        schema = schemas['books']
+
+    url = peewee.CharField(max_length=500)
+    book = peewee.ForeignKeyField(Book, on_delete='CASCADE')
+
+
 def create_tables():
     tables = [
         ('TypeCover', TypeCover),
@@ -87,6 +95,7 @@ def create_tables():
         ('PublishingCompany', PublishingCompany),
         ('Book', Book),
         ('TypeCover', TypeCover),
+        ('ImageBook', ImageBook),
     ]
     for table in tables:
         try:

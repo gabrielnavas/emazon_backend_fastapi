@@ -5,8 +5,10 @@ from modules.users import login_router, register_router
 
 from modules.books.controllers.get_book import router as get_book_router
 from modules.books.controllers.get_books_page import router as get_books_page_router
+from modules.books.controllers.get_img import router as get_img_book_router
 
-from modules.stores.controllers import router as open_store_router
+from modules.stores.controllers.open_store import router as open_store_router
+from modules.stores.controllers.add_book import router as add_book_router
 
 app = FastAPI()
 
@@ -29,10 +31,12 @@ app.include_router(register_router)
 # books
 app.include_router(get_book_router)
 app.include_router(get_books_page_router)
+app.include_router(get_img_book_router)
 
 
 # store
 app.include_router(open_store_router)
+app.include_router(add_book_router)
 
 
 @app.on_event("startup")
