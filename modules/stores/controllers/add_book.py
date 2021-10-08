@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, status, Request, Response, Depends, File, UploadFile
@@ -40,6 +40,16 @@ async def add_book(bookBody: BookBody, request: Request, response: Response):
         user_from_token = get_user_from_token_or_error(
             request.headers['authorization']
         )
+
+        # --------------------
+        # TODO
+        # verificar se author, category etc exist no banco pra passar pra baixo.
+
+        book_found = Book.select().where(Book.title == bookBody.title).first()
+        if book_found:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"detail": f'Já existe um livro com esse título'}
+
         book_created = Book.create(
             title=bookBody.title,
             description=bookBody.description,
@@ -59,8 +69,10 @@ async def add_book(bookBody: BookBody, request: Request, response: Response):
             store=Store.get(id=bookBody.store_id),
         )
         book_created = model_to_dict(book_created)
+        del book_created['store']
         return {"book": book_created}
     except Exception as e:
+        print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return {"detail": f'server error'}
 
@@ -115,6 +127,99 @@ async def add_imgs_book(book_id: int, request: Request, response: Response, file
             del img['book']
 
         return {"imgs": imgs_createds}
+    except Exception as e:
+        print(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"detail": f'server error'}
+
+
+@router.get("/api/book/type_cover")
+async def add_imgs_book(request: Request, response: Response, type_cover_name: Optional[str]):
+    try:
+        user_from_token = get_user_from_token_or_error(
+            request.headers['authorization']
+        )
+
+        type_covers = TypeCover.select().where(
+            TypeCover.type_name.contains(type_cover_name))
+        type_covers = [model_to_dict(type_cover) for type_cover in type_covers]
+
+        return {"type_covers": type_covers}
+    except Exception as e:
+        print(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"detail": f'server error'}
+
+
+@router.get("/api/book/language")
+async def add_imgs_book(request: Request, response: Response, language_query: Optional[str]):
+    try:
+        user_from_token = get_user_from_token_or_error(
+            request.headers['authorization']
+        )
+
+        languages = Language.select().where(
+            (Language.code.contains(language_query)) |
+            (Language.name.contains(language_query))
+        )
+        languages = [model_to_dict(language) for language in languages]
+
+        return {"languages": languages}
+    except Exception as e:
+        print(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"detail": f'server error'}
+
+
+@router.get("/api/book/category")
+async def add_imgs_book(request: Request, response: Response, category_query: Optional[str]):
+    try:
+        user_from_token = get_user_from_token_or_error(
+            request.headers['authorization']
+        )
+
+        categories = Category.select().where(
+            Category.name.contains(category_query)
+        )
+        categories = [model_to_dict(category) for category in categories]
+
+        return {"categories": categories}
+    except Exception as e:
+        print(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"detail": f'server error'}
+
+
+@ router.get("/api/book/authors")
+async def add_imgs_book(request: Request, response: Response, author_name: str):
+    try:
+        user_from_token = get_user_from_token_or_error(
+            request.headers['authorization']
+        )
+
+        authors = Author.select().where(Author.name.contains(author_name))
+        authors = [model_to_dict(author) for author in authors]
+
+        return {"authors": authors}
+    except Exception as e:
+        print(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"detail": f'server error'}
+
+
+@ router.get("/api/book/publishing_company")
+async def add_imgs_book(request: Request, response: Response, publishing_company_query: str):
+    try:
+        user_from_token = get_user_from_token_or_error(
+            request.headers['authorization']
+        )
+
+        publishing_companies = PublishingCompany().select().where(
+            PublishingCompany.name.contains(publishing_company_query))
+        publishing_companies = [model_to_dict(
+            publishing_company) for publishing_company in publishing_companies]
+
+        return {"publishing_companies": publishing_companies}
     except Exception as e:
         print(e)
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
