@@ -13,7 +13,6 @@ async def verify_token_header(
         token = splited[1]
         jwt = JwtCrypter()
         jwt.decode(token)
-        print(jwt.decode(token))
     except Exception as e:
         response.status_code = status.HTTP_401_UNAUTHORIZED
         raise HTTPException(

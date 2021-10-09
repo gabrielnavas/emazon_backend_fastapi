@@ -9,7 +9,7 @@ from modules.stores.models import Store
 
 from pycpfcnpj import cpfcnpj
 
-from .exceptions import ExceptionUser
+from modules.stores.exceptions import ExceptionUser
 
 router = APIRouter(
     dependencies=[Depends(verify_token_header)]
