@@ -31,7 +31,6 @@ class BookBody(BaseModel):
     language_id: int
     category_id: int
     publishing_company_id: int
-    store_id: int
 
 
 @router.post("/api/book")
@@ -41,14 +40,45 @@ async def add_book(bookBody: BookBody, request: Request, response: Response):
             request.headers['authorization']
         )
 
-        # --------------------
-        # TODO
-        # verificar se author, category etc exist no banco pra passar pra baixo.
+        # Verifica se existe as dependecias ----------------------------------
+        author_founds = Author.select().where(Author.id == bookBody.author_id)
+        if len(author_founds) == 0:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"detail": f'authors not found'}
 
-        book_found = Book.select().where(Book.title == bookBody.title).first()
-        if book_found:
+        type_cover_founds = TypeCover.select().where(
+            TypeCover.id == bookBody.type_cover_id)
+        if len(type_cover_founds) == 0:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"detail": f'type cover not found'}
+
+        language_founds = Language.select().where(Language.id == bookBody.language_id)
+        if len(language_founds) == 0:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"detail": f'language not found'}
+
+        category_founds = Category.select().where(Category.id == bookBody.category_id)
+        if len(category_founds) == 0:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"detail": f'category not found'}
+
+        publishing_company_founds = PublishingCompany.select().where(
+            PublishingCompany.id == bookBody.publishing_company_id)
+        if len(publishing_company_founds) == 0:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"detail": f'publishing company not found'}
+        # Verifica se existe as dependecias ----------------------------------
+
+        # Nao pode ser livros repetidos  ----------------------------------
+        book_founds = Book.select().where(Book.title == bookBody.title)
+        if len(book_founds) > 0:
             response.status_code = status.HTTP_400_BAD_REQUEST
             return {"detail": f'Já existe um livro com esse título'}
+        # Nao pode ser livros repetidos  ----------------------------------
+
+        # Pegar o store  ----------------------------------
+        store_found = Store.select().where(Store.salesman == user_from_token.id)
+        # Pegar o store  ----------------------------------
 
         book_created = Book.create(
             title=bookBody.title,
@@ -60,15 +90,16 @@ async def add_book(bookBody: BookBody, request: Request, response: Response):
             width=bookBody.width,
             thickness=bookBody.thickness,
             published_at=bookBody.published_at,
-            author=Author.get(id=bookBody.author_id),
-            type_cover=TypeCover.get(id=bookBody.type_cover_id),
-            language=Language.get(id=bookBody.language_id),
-            category=Category.get(id=bookBody.category_id),
-            publishing_company=PublishingCompany.get(
-                id=bookBody.publishing_company_id),
-            store=Store.get(id=bookBody.store_id),
+            author=author_founds[0],
+            type_cover=type_cover_founds[0],
+            language=language_founds[0],
+            category=category_founds[0],
+            publishing_company=publishing_company_founds[0],
+            store=store_found[0],
         )
+
         book_created = model_to_dict(book_created)
+        response.status_code = status.HTTP_201_CREATED
         del book_created['store']
         return {"book": book_created}
     except Exception as e:
@@ -111,8 +142,10 @@ async def add_imgs_book(book_id: int, request: Request, response: Response, file
 
         """
             TODO:
+            refactory
             verify filetype jpeg
-            verify min and max files
+            verify len file
+            if len or filetype is wrong, delete book
         """
 
         book_found = Book.select().where(Book.id == book_id)
